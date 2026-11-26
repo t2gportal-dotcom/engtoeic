@@ -191,12 +191,29 @@ window.BT_TOEIC_APP = (function () {
       const label = switchBtn.querySelector(".darkmode-switch-label");
       if (label) label.textContent = t === "dark" ? "Dark Mode" : "Light Mode";
     }
+    const themeColorMeta = document.querySelector('meta[name="theme-color"]');
+    if (themeColorMeta) {
+      themeColorMeta.setAttribute("content", t === "dark" ? "#0b1120" : "#4f46e5");
+    }
+  }
+
+  /* Register PWA Service Worker when served over HTTPS or localhost */
+  function registerServiceWorker() {
+    if (
+      "serviceWorker" in navigator &&
+      (window.location.protocol === "https:" ||
+        window.location.hostname === "localhost" ||
+        window.location.hostname === "127.0.0.1")
+    ) {
+      navigator.serviceWorker.register("sw.js").catch(() => {});
+    }
   }
 
   /* Render shared Top Navbar + Right Drawer + Floating Elevator + Modal */
   function initSharedShell(options) {
     const opts = options || {};
     applyTheme(getTheme());
+    registerServiceWorker();
 
     const switchBtn = document.getElementById("darkModeSwitch");
     if (switchBtn) {

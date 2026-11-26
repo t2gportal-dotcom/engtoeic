@@ -2779,3 +2779,80 @@
   border-color: #94a3b8;
   color: #ffffff;
 }
+
+/* ==========================================================================
+   Mobile Component Polish (Touch-friendly spacing & zero overflow)
+   ========================================================================== */
+@media (max-width: 640px) {
+  .contentblock {
+    padding: 16px 14px;
+    border-radius: 14px;
+    margin-bottom: 14px;
+  }
+
+  .learncourse-heading-xl {
+    font-size: 1.35rem;
+  }
+
+  .learncourse-heading {
+    font-size: 1.02rem;
+  }
+
+  .search-form {
+    gap: 8px;
+  }
+
+  .search-form .btn {
+    padding: 0 14px;
+    font-size: 13px;
+  }
+
+  .learncourse-unit-lesson-activity {
+    padding: 10px 10px;
+    gap: 10px;
+  }
+
+  .lesson-nav-controls {
+    gap: 6px;
+  }
+
+  .lesson-nav-link {
+    font-size: 12px;
+    padding: 4px 4px;
+  }
+
+  .quiz-question-card {
+    padding: 22px 16px 20px;
+  }
+
+  .quiz-question-title {
+    font-size: 1.1rem;
+  }
+
+  .flashcard-3d {
+    min-height: 300px;
+  }
+
+  .fc-front-word {
+    font-size: 1.6rem;
+  }
+
+  .review-controls {
+    justify-content: center;
+  }
+
+  .learncourse-bottom-bar {
+    height: calc(48px + env(safe-area-inset-bottom, 0px));
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  .lecture-slide-canvas {
+    padding: 18px 16px;
+    min-height: 240px;
+  }
+
+  .lecture-article {
+    padding: 16px 14px;
+    overflow-x: auto;
+  }
+}

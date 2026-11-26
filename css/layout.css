@@ -606,3 +606,68 @@
     display: none;
   }
 }
+
+/* ==========================================================================
+   Enhanced Mobile & Standalone PWA Responsive Polish
+   ========================================================================== */
+@media (max-width: 640px) {
+  .topnav-wrapper {
+    padding: 0 12px;
+    gap: 8px;
+  }
+
+  .brand-logo {
+    padding: 4px 6px;
+  }
+
+  .brand-text {
+    font-size: 1.05rem;
+  }
+
+  .topnav-right {
+    gap: 8px;
+  }
+
+  .darkmode-switch {
+    padding: 4px 6px;
+  }
+
+  .darkmode-switch-label {
+    display: none;
+  }
+
+  .learncourse-navigation {
+    padding: 0 12px;
+    gap: 8px;
+  }
+
+  .breadcrumb {
+    font-size: 12px;
+    gap: 4px;
+  }
+
+  .breadcrumb-link {
+    display: none;
+  }
+
+  .breadcrumb-sep {
+    display: none;
+  }
+
+  .sm-container {
+    padding: 0 12px;
+  }
+
+  .learncourse-main-content {
+    padding: 8px 0 calc(36px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .right-drawer {
+    top: var(--topnav-height);
+    right: 0;
+    bottom: 0;
+    width: 100vw;
+    max-width: 100vw;
+    border-radius: 0;
+  }
+}

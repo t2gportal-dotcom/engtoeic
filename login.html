@@ -2,7 +2,14 @@
 <html lang="vi" data-theme="light">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#4f46e5" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="BT TOEIC" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" type="image/png" href="assets/icons/icon-192.png" />
+  <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png" />
   <meta name="robots" content="noindex, nofollow" />
   <title>Đăng nhập - BT TOEIC</title>
   <script>
@@ -256,8 +263,19 @@
       function syncThemeLabel() {
         const isDark = document.documentElement.getAttribute("data-theme") === "dark";
         themeBtn.textContent = isDark ? "Dark Mode" : "Light Mode";
+        const themeMeta = document.querySelector('meta[name="theme-color"]');
+        if (themeMeta) themeMeta.setAttribute("content", isDark ? "#0b1120" : "#4f46e5");
       }
       syncThemeLabel();
+
+      if (
+        "serviceWorker" in navigator &&
+        (window.location.protocol === "https:" ||
+          window.location.hostname === "localhost" ||
+          window.location.hostname === "127.0.0.1")
+      ) {
+        navigator.serviceWorker.register("sw.js").catch(() => {});
+      }
 
       themeBtn.addEventListener("click", () => {
         const next = document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark";
