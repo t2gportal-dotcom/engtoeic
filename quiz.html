@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <script src="js/auth.js"></script>
+  <script>BT_TOEIC_AUTH.requireAuth();</script>
+  <title>Trắc nghiệm từ vựng - Complete TOEIC - BT TOEIC</title>
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem("bt_toeic_theme_v1");
+        if (t === "dark" || t === "light") document.documentElement.setAttribute("data-theme", t);
+      } catch (e) {}
+    })();
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/tokens.css" />
+  <link rel="stylesheet" href="css/layout.css" />
+  <link rel="stylesheet" href="css/components.css" />
+</head>
+<body>
+  <!-- Fixed Top Navbar -->
+  <header class="topnav-wrapper">
+    <div class="topnav-left">
+      <a href="index.html" class="brand-logo" aria-label="BT TOEIC">
+        <span class="brand-text">BT TOEIC</span>
+      </a>
+    </div>
+
+    <nav class="topnav-right" aria-label="Điều hướng chính">
+      <ul class="topnav-links">
+        <li><a href="#" class="topnav-link">Tài khoản luyện thi</a></li>
+        <li><a href="index.html" class="topnav-link is-current">Chương trình học</a></li>
+        <li><a href="#" class="topnav-link">Đề thi online</a></li>
+        <li><a href="flashcards.html?list=1" class="topnav-link">Flashcards</a></li>
+        <li><a href="#" class="topnav-link">Blog</a></li>
+        <li><a href="#" class="topnav-link">Kích hoạt tài khoản</a></li>
+      </ul>
+
+      <!-- Visible Dark Mode Switch -->
+      <button type="button" class="darkmode-switch" id="darkModeSwitch" role="switch" aria-checked="false" title="Bật / Tắt Dark Mode">
+        <span class="darkmode-switch-track" aria-hidden="true">
+          <span class="darkmode-switch-thumb"></span>
+        </span>
+        <span class="darkmode-switch-label">Light Mode</span>
+      </button>
+
+      <div class="user-menu-wrapper">
+        <button type="button" class="user-avatar-btn" id="userMenuBtn" aria-haspopup="true" aria-expanded="false" aria-label="Tài khoản người dùng">
+          <span class="user-avatar-circle">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true">
+              <path d="M12 12c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm0 2c-3.33 0-10 1.67-10 5v3h20v-3c0-3.33-6.67-5-10-5z"/>
+            </svg>
+          </span>
+          <span class="notif-badge">1</span>
+        </button>
+
+        <div class="user-dropdown" id="userDropdown" hidden>
+          <div class="user-dropdown-header">
+            <div class="user-dropdown-name">Học viên BT TOEIC</div>
+            <div class="user-dropdown-sub">Complete TOEIC • Đã kích hoạt</div>
+          </div>
+          <div class="user-dropdown-divider"></div>
+          <a href="index.html" class="user-dropdown-item">Quay lại Từ vựng TOEIC</a>
+          <a href="#" class="user-dropdown-item text-danger" data-action="reset-progress">Đặt lại tiến độ demo</a>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Main Learn Course Shell -->
+  <div class="learncourse-wrapper" id="learnCourseWrapper">
+    <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+    <!-- Fixed Left Lesson Sidebar -->
+    <aside class="learncourse-sidebar" aria-label="Bài học hiện tại">
+      <div class="learncourse-sidebar-heading">
+        <a href="index.html" class="sidebar-course-title" id="sidebarListTitle">List 1</a>
+        <button type="button" class="sidebar-toggle-btn" id="sidebarToggleBtn" title="Thu gọn / Mở rộng thanh bên" aria-label="Thu gọn thanh bên">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="4" width="18" height="16" rx="2"></rect>
+            <line x1="9" y1="4" x2="9" y2="20"></line>
+          </svg>
+        </button>
+      </div>
+
+      <nav class="learncourse-sidebar-list" id="lessonSidebarList" aria-label="Hoạt động trong List"></nav>
+    </aside>
+
+    <!-- Main Content Column -->
+    <div class="learncourse-main">
+      <div class="learncourse-navigation">
+        <div class="learncourse-nav-left">
+          <button type="button" class="mobile-sidebar-btn" id="mobileSidebarBtn" aria-label="Mở danh sách bài học">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+            <span>Bài học</span>
+          </button>
+
+          <nav class="breadcrumb" aria-label="Breadcrumb" id="breadcrumbNav"></nav>
+        </div>
+
+        <div class="learncourse-nav-right">
+          <div class="lesson-nav-controls">
+            <a href="#" class="lesson-nav-link" id="prevActivityLink">&lt; Bài trước</a>
+            <a href="#" class="lesson-nav-link" id="nextActivityLink">Bài sau &gt;</a>
+          </div>
+          <button type="button" class="nav-icon-btn" id="openDrawerBtn" title="Từ điển &amp; Ghi chú" aria-label="Mở Từ điển và Ghi chú">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+              <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <main class="learncourse-main-content" id="mainScrollArea">
+        <div class="sm-container" id="mainContentMount"></div>
+      </main>
+
+      <!-- Bottom Sticky Complete & Next Bar -->
+      <div class="learncourse-bottom-bar">
+        <button type="button" class="bottom-complete-btn" id="completeAndNextBtn">
+          <span>HOÀN THÀNH &amp; HỌC BÀI TIẾP THEO</span>
+          <span aria-hidden="true">&rarr;</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Right Dictionary / Notes Drawer -->
+    <aside class="right-drawer" id="rightDrawer" aria-label="Từ điển và Ghi chú" hidden>
+      <div class="right-drawer-header">
+        <div class="right-drawer-tabs">
+          <button type="button" class="drawer-tab is-active" data-drawer-tab="dict">Từ điển</button>
+          <button type="button" class="drawer-tab" data-drawer-tab="notes">Ghi chú</button>
+        </div>
+        <button type="button" class="drawer-close-btn" id="closeDrawerBtn" aria-label="Đóng">&times;</button>
+      </div>
+      <div class="right-drawer-body" id="rightDrawerBody"></div>
+    </aside>
+  </div>
+
+  <!-- Right Floating Elevator Widget -->
+  <div class="site-elevator" aria-label="Công cụ nhanh">
+    <button type="button" class="elevator-btn" id="elevatorDictBtn" title="Tra từ điển nhanh">
+      <span class="elevator-dict-badge">A-V</span>
+      <span class="elevator-label">Từ điển</span>
+    </button>
+    <button type="button" class="elevator-btn" id="elevatorNotesBtn" title="Ghi chú bài học">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+        <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Activity Preview Modal -->
+  <div class="modal-overlay" id="activityModal" hidden role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div>
+          <div class="modal-eyebrow" id="modalEyebrow">List 1</div>
+          <h3 class="modal-title" id="modalTitle">Luyện tập</h3>
+        </div>
+        <button type="button" class="modal-close-btn" id="modalCloseBtn" aria-label="Đóng">&times;</button>
+      </div>
+      <div class="modal-body" id="modalBody"></div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline" id="modalCancelBtn">Đóng</button>
+        <button type="button" class="btn btn-success" id="modalToggleDoneBtn">Đánh dấu hoàn thành</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast-container" id="toastContainer" aria-live="polite"></div>
+
+  <script src="js/vocab-data.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/common.js"></script>
+  <script src="js/quiz-page.js"></script>
+</body>
+</html>

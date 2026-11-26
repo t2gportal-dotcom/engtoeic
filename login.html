@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Đăng nhập - BT TOEIC</title>
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem("bt_toeic_theme_v1");
+        if (t === "dark" || t === "light") document.documentElement.setAttribute("data-theme", t);
+      } catch (e) {}
+    })();
+  </script>
+  <link rel="stylesheet" href="css/tokens.css" />
+  <style>
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      background:
+        radial-gradient(circle at 18% 18%, rgba(79, 70, 229, 0.14), transparent 42%),
+        radial-gradient(circle at 82% 82%, rgba(16, 185, 129, 0.12), transparent 44%),
+        var(--color-bg-subtle);
+    }
+
+    .login-theme-btn {
+      position: fixed;
+      top: 18px;
+      right: 20px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 12px;
+      border-radius: var(--radius-full);
+      border: 1px solid var(--color-border);
+      background-color: var(--color-bg);
+      color: var(--color-text-secondary);
+      font-size: 12.5px;
+      font-weight: 600;
+      box-shadow: var(--shadow-xs);
+    }
+
+    .login-theme-btn:hover {
+      border-color: var(--color-primary);
+      color: var(--color-text);
+    }
+
+    .login-card {
+      width: 100%;
+      max-width: 410px;
+      background-color: var(--color-bg);
+      border: 1px solid var(--color-border);
+      border-radius: 20px;
+      box-shadow: var(--shadow-md);
+      padding: 36px 32px 32px;
+    }
+
+    .login-brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 1.35rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      background: var(--color-primary-gradient);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      margin-bottom: 10px;
+    }
+
+    .login-brand::before {
+      content: "";
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      background: var(--color-primary-gradient);
+      box-shadow: 0 0 0 4px var(--color-blue-50);
+    }
+
+    .login-title {
+      margin: 0 0 6px;
+      font-size: 1.45rem;
+      font-weight: 700;
+      color: var(--color-text);
+      letter-spacing: -0.02em;
+    }
+
+    .login-sub {
+      margin: 0 0 24px;
+      font-size: var(--text-sm);
+      color: var(--color-text-secondary);
+    }
+
+    .login-field {
+      margin-bottom: 16px;
+    }
+
+    .login-label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: var(--text-xs);
+      font-weight: 600;
+      color: var(--color-text-secondary);
+    }
+
+    .login-input {
+      width: 100%;
+      height: 44px;
+      padding: 8px 14px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--color-border-input);
+      background-color: var(--color-bg-subtle);
+      color: var(--color-text);
+      font-size: var(--text-sm);
+      outline: none;
+      transition: border-color 0.16s ease, box-shadow 0.16s ease, background-color 0.16s ease;
+    }
+
+    .login-input:focus {
+      border-color: var(--color-primary);
+      background-color: var(--color-bg);
+      box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.14);
+    }
+
+    .login-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin: 4px 0 20px;
+      font-size: var(--text-xs);
+      color: var(--color-text-secondary);
+    }
+
+    .login-remember {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .login-remember input {
+      accent-color: var(--color-primary);
+      width: 15px;
+      height: 15px;
+    }
+
+    .login-submit {
+      width: 100%;
+      height: 44px;
+      border: none;
+      border-radius: var(--radius-md);
+      background: var(--color-primary-gradient);
+      color: #ffffff;
+      font-size: var(--text-sm);
+      font-weight: 600;
+      box-shadow: var(--shadow-primary);
+      transition: filter 0.15s ease, transform 0.1s ease;
+    }
+
+    .login-submit:hover {
+      filter: brightness(1.06);
+    }
+
+    .login-submit:active {
+      transform: scale(0.99);
+    }
+
+    .login-error {
+      margin-top: 14px;
+      padding: 10px 12px;
+      border-radius: var(--radius-sm);
+      background-color: rgba(239, 68, 68, 0.12);
+      border: 1px solid rgba(239, 68, 68, 0.35);
+      color: var(--color-danger);
+      font-size: var(--text-xs);
+      font-weight: 500;
+      text-align: center;
+    }
+
+    .login-footer {
+      margin-top: 22px;
+      padding-top: 16px;
+      border-top: 1px solid var(--color-border-subtle);
+      text-align: center;
+      font-size: 12px;
+      color: var(--color-text-muted);
+    }
+  </style>
+</head>
+<body>
+  <button type="button" class="login-theme-btn" id="loginThemeBtn">Chế độ Sáng / Tối</button>
+
+  <main class="login-card">
+    <div class="login-brand">BT TOEIC</div>
+    <h1 class="login-title">Đăng nhập để học</h1>
+    <p class="login-sub">Không gian luyện thi TOEIC cá nhân</p>
+
+    <form id="loginForm" autocomplete="on">
+      <div class="login-field">
+        <label class="login-label" for="usernameInput">Tên đăng nhập</label>
+        <input type="text" id="usernameInput" class="login-input" placeholder="Nhập tên đăng nhập" required autofocus />
+      </div>
+
+      <div class="login-field">
+        <label class="login-label" for="passwordInput">Mật khẩu</label>
+        <input type="password" id="passwordInput" class="login-input" placeholder="Nhập mật khẩu" required />
+      </div>
+
+      <div class="login-row">
+        <label class="login-remember">
+          <input type="checkbox" id="rememberCheckbox" checked />
+          <span>Ghi nhớ đăng nhập</span>
+        </label>
+      </div>
+
+      <button type="submit" class="login-submit">Đăng nhập</button>
+      <div class="login-error" id="loginError" hidden></div>
+    </form>
+
+    <div class="login-footer">BT TOEIC • Khu vực học tập riêng tư</div>
+  </main>
+
+  <script src="js/auth.js"></script>
+  <script>
+    (function () {
+      "use strict";
+      const AUTH = window.BT_TOEIC_AUTH;
+
+      function getSafeNextUrl() {
+        const params = new URLSearchParams(window.location.search);
+        const next = params.get("next") || "index.html";
+        if (/^[a-zA-Z0-9._-]+\.html(\?[a-zA-Z0-9=&_%-]*)?$/.test(next) && !next.startsWith("login.html")) {
+          return next;
+        }
+        return "index.html";
+      }
+
+      if (AUTH.getSession()) {
+        window.location.replace(getSafeNextUrl());
+        return;
+      }
+
+      const form = document.getElementById("loginForm");
+      const userInput = document.getElementById("usernameInput");
+      const passInput = document.getElementById("passwordInput");
+      const rememberCb = document.getElementById("rememberCheckbox");
+      const errBox = document.getElementById("loginError");
+      const themeBtn = document.getElementById("loginThemeBtn");
+
+      function syncThemeLabel() {
+        const isDark = document.documentElement.getAttribute("data-theme") === "dark";
+        themeBtn.textContent = isDark ? "Dark Mode" : "Light Mode";
+      }
+      syncThemeLabel();
+
+      themeBtn.addEventListener("click", () => {
+        const next = document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark";
+        document.documentElement.setAttribute("data-theme", next);
+        try { localStorage.setItem("bt_toeic_theme_v1", next); } catch (_) {}
+        syncThemeLabel();
+      });
+
+      form.addEventListener("submit", (e) => {
+        e.preventDefault();
+        errBox.hidden = true;
+        const res = AUTH.login(userInput.value, passInput.value, rememberCb.checked);
+        if (res.ok) {
+          window.location.replace(getSafeNextUrl());
+        } else {
+          errBox.textContent = res.error;
+          errBox.hidden = false;
+          passInput.value = "";
+          passInput.focus();
+        }
+      });
+    })();
+  </script>
+</body>
+</html>
