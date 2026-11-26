@@ -156,7 +156,14 @@ window.BT_TOEIC_APP = (function () {
       if (!cleaned) return;
       const utter = new SpeechSynthesisUtterance(cleaned);
       utter.lang = lang || "en-US";
-      utter.rate = 0.95;
+      let savedRate = 0.95;
+      try {
+        const r = parseFloat(localStorage.getItem("bt_toeic_speech_rate_v1"));
+        if (r === 0.72 || r === 0.95) savedRate = r;
+      } catch (_) {
+        /* ignore */
+      }
+      utter.rate = savedRate;
       const voices = window.speechSynthesis.getVoices();
       const preferred =
         voices.find((v) => v.lang.toLowerCase() === utter.lang.toLowerCase()) ||

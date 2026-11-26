@@ -10,6 +10,119 @@
   let shuffledOrder = [];
   let pageFilter = "all";
 
+  /* Repeat loop playback & audio settings state */
+  const RATE_STORAGE_KEY = "bt_toeic_speech_rate_v1";
+  const DELAY_STORAGE_KEY = "bt_toeic_loop_delay_v1";
+  const LOOP_ICON = `<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"></polyline><path d="M3 11V9a4 4 0 0 1 4-4h14"></path><polyline points="7 23 3 19 7 15"></polyline><path d="M21 13v2a4 4 0 0 1-4 4H3"></path></svg>`;
+  const PAUSE_ICON = `<svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><rect x="6" y="4" width="4" height="16" rx="1"></rect><rect x="14" y="4" width="4" height="16" rx="1"></rect></svg>`;
+
+  function loadSpeechRate() {
+    try {
+      const r = parseFloat(localStorage.getItem(RATE_STORAGE_KEY));
+      if (r === 0.72 || r === 0.95) return r;
+    } catch (_) {
+      /* ignore */
+    }
+    return 0.95;
+  }
+
+  function loadLoopDelay() {
+    try {
+      const d = parseInt(localStorage.getItem(DELAY_STORAGE_KEY), 10);
+      if (d === 1 || d === 2 || d === 3) return d;
+    } catch (_) {
+      /* ignore */
+    }
+    return 2;
+  }
+
+  let speechRate = loadSpeechRate();
+  let loopDelaySec = loadLoopDelay();
+  let loopingKey = null;
+  let loopSessionId = 0;
+  let loopTimerId = null;
+  let activeLoopUtterance = null;
+
+  function cleanSpokenText(rawText) {
+    return String(rawText || "")
+      .replace(/\(=Dịch:[\s\S]*?\)/gi, "")
+      .replace(/[\[\]]/g, "")
+      .trim();
+  }
+
+  function syncLoopButtons() {
+    mainContentMount.querySelectorAll(".audio-loop-btn").forEach((btn) => {
+      const isThis = loopingKey !== null && btn.dataset.loopKey === loopingKey;
+      btn.classList.toggle("is-looping", isThis);
+      btn.setAttribute("aria-pressed", String(isThis));
+      btn.title = isThis ? "Tạm dừng nghe lặp lại" : `Nghe lặp lại (nghỉ ${loopDelaySec}s)`;
+      btn.innerHTML = `${isThis ? PAUSE_ICON : LOOP_ICON}<span>${isThis ? "Tạm dừng" : "Lặp"}</span>`;
+    });
+  }
+
+  function stopLoop(cancelSpeech) {
+    loopSessionId++;
+    if (loopTimerId !== null) {
+      clearTimeout(loopTimerId);
+      loopTimerId = null;
+    }
+    activeLoopUtterance = null;
+    loopingKey = null;
+    if (cancelSpeech && "speechSynthesis" in window) {
+      try {
+        window.speechSynthesis.cancel();
+      } catch (_) {
+        /* ignore */
+      }
+    }
+    syncLoopButtons();
+  }
+
+  function startLoop(key, rawText) {
+    if (!("speechSynthesis" in window)) {
+      APP.showToast("Trình duyệt không hỗ trợ phát âm tự động");
+      return;
+    }
+    const spoken = cleanSpokenText(rawText);
+    if (!spoken) return;
+
+    stopLoop(true);
+    loopingKey = key;
+    const mySession = loopSessionId;
+    syncLoopButtons();
+
+    function speakOnce() {
+      if (mySession !== loopSessionId) return;
+      try {
+        window.speechSynthesis.cancel();
+        const utter = new SpeechSynthesisUtterance(spoken);
+        utter.lang = "en-US";
+        utter.rate = speechRate;
+        const voices = window.speechSynthesis.getVoices();
+        const preferred =
+          voices.find((v) => v.lang.toLowerCase() === "en-us") ||
+          voices.find((v) => v.lang.toLowerCase().startsWith("en"));
+        if (preferred) utter.voice = preferred;
+
+        let scheduled = false;
+        const scheduleNext = () => {
+          if (scheduled || mySession !== loopSessionId) return;
+          scheduled = true;
+          loopTimerId = setTimeout(speakOnce, loopDelaySec * 1000);
+        };
+        utter.onend = scheduleNext;
+        utter.onerror = scheduleNext;
+
+        activeLoopUtterance = utter;
+        window.speechSynthesis.speak(utter);
+      } catch (_) {
+        stopLoop(false);
+      }
+    }
+
+    speakOnce();
+  }
+
   const sidebarListTitle = document.getElementById("sidebarListTitle");
   const lessonSidebarList = document.getElementById("lessonSidebarList");
   const breadcrumbNav = document.getElementById("breadcrumbNav");
@@ -18,6 +131,62 @@
   const mainContentMount = document.getElementById("mainContentMount");
   const mainScrollArea = document.getElementById("mainScrollArea");
   const completeAndNextBtn = document.getElementById("completeAndNextBtn");
+
+  /* Handle clicks on loop buttons, audio settings pills, and stop loop if user clicks any normal speaker button */
+  mainContentMount.addEventListener("click", (e) => {
+    const rateBtn = e.target.closest("[data-rate]");
+    if (rateBtn) {
+      const nextRate = parseFloat(rateBtn.dataset.rate);
+      if (nextRate === 0.72 || nextRate === 0.95) {
+        speechRate = nextRate;
+        try {
+          localStorage.setItem(RATE_STORAGE_KEY, String(speechRate));
+        } catch (_) {}
+        mainContentMount.querySelectorAll("[data-rate]").forEach((b) => {
+          b.classList.toggle("is-active", parseFloat(b.dataset.rate) === speechRate);
+        });
+        APP.showToast(speechRate === 0.72 ? "Tốc độ đọc: Chậm" : "Tốc độ đọc: Vừa");
+      }
+      return;
+    }
+
+    const delayBtn = e.target.closest("[data-delay]");
+    if (delayBtn) {
+      const nextDelay = parseInt(delayBtn.dataset.delay, 10);
+      if (nextDelay === 1 || nextDelay === 2 || nextDelay === 3) {
+        loopDelaySec = nextDelay;
+        try {
+          localStorage.setItem(DELAY_STORAGE_KEY, String(loopDelaySec));
+        } catch (_) {}
+        mainContentMount.querySelectorAll("[data-delay]").forEach((b) => {
+          b.classList.toggle("is-active", parseInt(b.dataset.delay, 10) === loopDelaySec);
+        });
+        syncLoopButtons();
+        APP.showToast(`Nghỉ giữa các lần lặp: ${loopDelaySec}s`);
+      }
+      return;
+    }
+
+    const loopBtn = e.target.closest(".audio-loop-btn");
+    if (loopBtn) {
+      e.stopPropagation();
+      const key = loopBtn.dataset.loopKey;
+      const text = loopBtn.dataset.loopText;
+      if (loopingKey === key) {
+        stopLoop(true);
+      } else {
+        startLoop(key, text);
+      }
+      return;
+    }
+
+    if (e.target.closest("[data-speak]") && loopingKey !== null) {
+      stopLoop(false);
+    }
+  });
+
+  window.addEventListener("pagehide", () => stopLoop(true));
+  window.addEventListener("beforeunload", () => stopLoop(true));
 
   const modal = APP.createModalController(() => renderSidebar());
   APP.initSharedShell({
@@ -145,20 +314,35 @@
           <div class="termlist-section-label">Ví dụ:</div>
           <ul class="termlist-examples">
             ${term.examples
-              .map(
-                (ex) => `
+              .map((ex, exIdx) => {
+                const exKey = `ex:${term.word}:${exIdx}`;
+                const isLoopingEx = loopingKey === exKey;
+                return `
                 <li>
                   <button type="button" class="audio-btn audio-btn-inline" data-speak="${APP.escapeHtml(ex)}" data-lang="en-US" title="Nghe câu ví dụ" aria-label="Nghe câu ví dụ">
                     ${APP.ICONS.speaker}
                   </button>
+                  <button
+                    type="button"
+                    class="audio-btn audio-loop-btn audio-loop-btn-inline${isLoopingEx ? " is-looping" : ""}"
+                    data-loop-key="${APP.escapeHtml(exKey)}"
+                    data-loop-text="${APP.escapeHtml(ex)}"
+                    title="${isLoopingEx ? "Tạm dừng nghe lặp lại" : `Nghe lặp lại câu ví dụ (nghỉ ${loopDelaySec}s)`}"
+                    aria-pressed="${isLoopingEx ? "true" : "false"}"
+                  >
+                    ${isLoopingEx ? PAUSE_ICON : LOOP_ICON}<span>${isLoopingEx ? "Tạm dừng" : "Lặp"}</span>
+                  </button>
                   <span>${APP.formatExampleHtml(ex)}</span>
                 </li>
-              `
-              )
+              `;
+              })
               .join("")}
           </ul>
         `
         : "";
+
+    const wordKey = `w:${term.word}`;
+    const isLoopingWord = loopingKey === wordKey;
 
     return `
       <article class="termlist-item contentblock">
@@ -173,6 +357,16 @@
               </button>
               <button type="button" class="audio-btn" data-speak="${APP.escapeHtml(term.word)}" data-lang="en-US" title="Phát âm US">
                 ${APP.ICONS.speaker}<span>US</span>
+              </button>
+              <button
+                type="button"
+                class="audio-btn audio-loop-btn${isLoopingWord ? " is-looping" : ""}"
+                data-loop-key="${APP.escapeHtml(wordKey)}"
+                data-loop-text="${APP.escapeHtml(term.word)}"
+                title="${isLoopingWord ? "Tạm dừng nghe lặp lại" : `Nghe lặp lại (nghỉ ${loopDelaySec}s)`}"
+                aria-pressed="${isLoopingWord ? "true" : "false"}"
+              >
+                ${isLoopingWord ? PAUSE_ICON : LOOP_ICON}<span>${isLoopingWord ? "Tạm dừng" : "Lặp"}</span>
               </button>
             </h2>
             <div class="termlist-section-label">Định nghĩa:</div>
@@ -222,6 +416,24 @@
           placeholder="Lọc nhanh trong ${APP.escapeHtml(list.title)}..."
           value="${APP.escapeHtml(termFilterQuery)}"
         />
+      </div>
+
+      <div class="audio-settings-bar" role="group" aria-label="Cài đặt phát âm và lặp lại">
+        <div class="audio-setting-group">
+          <span class="audio-setting-label">Tốc độ đọc:</span>
+          <div class="audio-pill-group">
+            <button type="button" class="pager-pill${speechRate === 0.72 ? " is-active" : ""}" data-rate="0.72">Chậm</button>
+            <button type="button" class="pager-pill${speechRate === 0.95 ? " is-active" : ""}" data-rate="0.95">Vừa</button>
+          </div>
+        </div>
+        <div class="audio-setting-group">
+          <span class="audio-setting-label">Nghỉ lặp:</span>
+          <div class="audio-pill-group">
+            <button type="button" class="pager-pill${loopDelaySec === 1 ? " is-active" : ""}" data-delay="1">1s</button>
+            <button type="button" class="pager-pill${loopDelaySec === 2 ? " is-active" : ""}" data-delay="2">2s</button>
+            <button type="button" class="pager-pill${loopDelaySec === 3 ? " is-active" : ""}" data-delay="3">3s</button>
+          </div>
+        </div>
       </div>
 
       <div class="termlist-meta-row">
